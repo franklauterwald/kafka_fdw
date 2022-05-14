@@ -1180,6 +1180,7 @@ kafkaStart(KafkaFdwExecutionState *festate)
                 (errcode(ERRCODE_FDW_ERROR),
                  errmsg_internal("kafka_fdw: Failed to start consuming: %s", rd_kafka_err2str(err))));
     }
+    sleep(3);
     return true;
 }
 
