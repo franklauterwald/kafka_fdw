@@ -156,15 +156,15 @@ KafkaScanOpToList(KafkaScanOp *scan_op)
       (void *) makeConst(
         INT8OID, -1, InvalidOid, sizeof(int64), Int64GetDatum(scan_op->oh), scan_op->oh_infinite, FLOAT8PASSBYVAL));
 
-    res = lappend(res, parmaListToParmaId(scan_op->p_params));
-    res = lappend(res, parmaListToParmaId(scan_op->o_params));
+    res = lappend(res, paramListToParamId(scan_op->p_params));
+    res = lappend(res, paramListToParamId(scan_op->o_params));
     res = lappend(res, scan_op->p_param_ops);
     res = lappend(res, scan_op->o_param_ops);
     return res;
 }
 
 List *
-parmaListToParmaId(List *input)
+paramListToParamId(List *input)
 {
     List *    res = NIL;
     ListCell *lc;

@@ -271,7 +271,7 @@ List *KafkaScanOpToList(KafkaScanOp *scan_op);
 bool  kafka_valid_scanop_list(List *scan_op_list);
 List *dnfNorm(Expr *expr, int partition_attnum, int offset_attnum);
 List *applyKafkaScanOpList(List *a, List *b);
-List *parmaListToParmaId(List *input);
+List *paramListToParamId(List *input);
 
 KafkaScanOp *NewKafkaScanOp(void);
 
