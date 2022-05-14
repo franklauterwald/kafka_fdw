@@ -57,7 +57,8 @@
 #define DEFAULT_KAFKA_OPTIONS                                                                                          \
     .batch_size = 1000, .buffer_delay = 100,                                                                           \
 	.offset_attnum = -1, .partition_attnum = -1, .timestamp_attnum  = -1, .raw_attnum = -1, .junk_attnum = -1,         \
-    .junk_error_attnum = -1, .strict = false, .num_parse_col = 0, .ignore_junk = false, .num_partitions = 10
+    .junk_error_attnum = -1, .strict = false, .num_parse_col = 0, .ignore_junk = false, .num_partitions = 10,          \
+	.ssl = false, .key_location = NULL, .certificate_location = NULL, .ca_location = NULL
 
 #define parsable_attnum(_attn, _kop)                                                                                   \
     (_attn != _kop.junk_attnum && _attn != _kop.junk_error_attnum && _attn != _kop.partition_attnum &&                 \
@@ -142,6 +143,10 @@ typedef struct KafkaOptions
 {
     char *brokers;
     char *topic;
+    bool  ssl;
+    char* key_location;
+    char* certificate_location;
+    char* ca_location;
     int   batch_size;
     int   buffer_delay;
     int   num_partitions;    /* number of partitions */

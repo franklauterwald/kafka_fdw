@@ -14,7 +14,22 @@ KafkaFdwGetConnection(KafkaOptions *k_options,
     if (k_options->brokers == NULL || k_options->topic == NULL)
         elog(ERROR, "brokers and topic need to be set ");
 
+    if (k_options->ssl == true && (k_options->key_location == NULL || k_options->certificate_location == NULL
+    		|| k_options->ca_location == NULL))
+        elog(ERROR, "ssl enabled but not fully configured ");
+
     conf = rd_kafka_conf_new();
+
+    if (k_options->ssl) {
+    	if (rd_kafka_conf_set(conf, "security.protocol", "ssl", errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK )
+    		elog(ERROR, "%s", errstr);
+    	if (rd_kafka_conf_set(conf, "ssl.key.location", k_options->key_location, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK )
+    		elog(ERROR, "%s", errstr);
+    	if (rd_kafka_conf_set(conf, "ssl.certificate.location", k_options->certificate_location, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK )
+    		elog(ERROR, "%s", errstr);
+    	if (rd_kafka_conf_set(conf, "ssl.ca.location", k_options->ca_location, errstr, sizeof(errstr)) != RD_KAFKA_CONF_OK )
+    		elog(ERROR, "%s", errstr);
+    }
 
     *kafka_handle = rd_kafka_new(RD_KAFKA_CONSUMER, conf, errstr, KAFKA_MAX_ERR_MSG);
 

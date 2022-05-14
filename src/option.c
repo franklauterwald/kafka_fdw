@@ -27,6 +27,10 @@ static const struct KafkaFdwOption valid_options[] = {
 
     /* Connection options */
     { "brokers", ForeignServerRelationId },
+	{ "ssl", ForeignServerRelationId },
+	{ "key.location", ForeignServerRelationId },
+	{ "certificate.location", ForeignServerRelationId },
+	{ "ca.location", ForeignServerRelationId },
 
     /* table options */
     { "topic", ForeignTableRelationId },
@@ -347,7 +351,12 @@ KafkaProcessKafkaOptions(Oid relid, KafkaOptions *kafka_options, List *options)
                                               .partition_attnum = -1,
 											  .timestamp_attnum = -1,
 											  .raw_attnum = -1,
-                                              .junk_attnum = -1 };
+                                              .junk_attnum = -1,
+											  .ssl = 0,
+											  .key_location = NULL,
+											  .certificate_location = NULL,
+											  .ca_location = NULL
+    };
 
     /* Support external use for option sanity checking */
     if (kafka_options == NULL)
@@ -371,6 +380,35 @@ KafkaProcessKafkaOptions(Oid relid, KafkaOptions *kafka_options, List *options)
                 ereport(ERROR,
                         (errcode(ERRCODE_SYNTAX_ERROR), errmsg("conflicting or redundant options %s", def->defname)));
             kafka_options->brokers = defGetString(def);
+        }
+
+        else if (strcmp(def->defname, "ssl") == 0)
+        {
+            kafka_options->ssl = defGetBoolean(def);
+        }
+
+        else if (strcmp(def->defname, "key.location") == 0)
+        {
+            if (kafka_options->key_location != NULL)
+                ereport(ERROR,
+                        (errcode(ERRCODE_SYNTAX_ERROR), errmsg("conflicting or redundant options %s", def->defname)));
+            kafka_options->key_location = defGetString(def);
+        }
+
+        else if (strcmp(def->defname, "certificate.location") == 0)
+        {
+            if (kafka_options->certificate_location != NULL)
+                ereport(ERROR,
+                        (errcode(ERRCODE_SYNTAX_ERROR), errmsg("conflicting or redundant options %s", def->defname)));
+            kafka_options->certificate_location = defGetString(def);
+        }
+
+        else if (strcmp(def->defname, "ca.location") == 0)
+        {
+            if (kafka_options->ca_location != NULL)
+                ereport(ERROR,
+                        (errcode(ERRCODE_SYNTAX_ERROR), errmsg("conflicting or redundant options %s", def->defname)));
+            kafka_options->ca_location = defGetString(def);
         }
 
         else if (strcmp(def->defname, "buffer_delay") == 0)

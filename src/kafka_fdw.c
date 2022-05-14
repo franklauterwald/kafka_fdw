@@ -633,7 +633,6 @@ transform_json_array(char *string)
             }
         }
         else /* ignore symbols under quotation */
-        {
             switch (*s)
             {
                 case '\"':
@@ -653,7 +652,6 @@ transform_json_array(char *string)
                         return string;
                     break;
             }
-        }
     }
     return string;
 }
@@ -938,7 +936,10 @@ ReadKafkaMessage(Relation                rel,
         }
         if (attnum == kafka_options->timestamp_attnum)
         {
-            values[m] = Int64GetDatum(rd_kafka_message_timestamp(message, NULL));
+        	int64_t timestamp;
+        	rd_kafka_timestamp_type_t ts_type = RD_KAFKA_TIMESTAMP_LOG_APPEND_TIME;
+        	timestamp = rd_kafka_message_timestamp(message, &ts_type);
+            values[m] = Int64GetDatum(timestamp);
             nulls[m]  = false;
             continue;
         }
