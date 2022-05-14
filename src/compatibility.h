@@ -37,7 +37,7 @@ ExecInitExprList(List *nodes, PlanState *parent)
 #endif
 
 /*
-    create_foreignscan_path signature has changed accros different pg versions
+    create_foreignscan_path signature has changed across different pg versions
     kafka_create_foreignscan_path harmonizes it
 */
 #if PG_VERSION_NUM >= 90600

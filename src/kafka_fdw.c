@@ -178,7 +178,7 @@ kafkaGetForeignRelSize(PlannerInfo *root, RelOptInfo *baserel, Oid foreigntablei
  * kafkaGetForeignPaths
  *      Create possible access paths for a scan on the kafka topic
  *
- *      We only push-down "offset" and "partition", an create only one
+ *      We only push-down "offset" and "partition", and create only one
  *      possible access path, which simply returns all records of
  *      the kafka topic.
  */
@@ -300,7 +300,7 @@ kafkaGetForeignPlan(PlannerInfo *root,
 
     /*
      * convert the list to a list of list of const
-     * this is neede as the fdw_private list must be copiable by copyObject()
+     * this is needed as the fdw_private list must be copyable by copyObject()
      * see comment for ForeignScan node in plannodes.h
      */
     scan_node_list = NIL;
@@ -709,8 +709,8 @@ kafkaIterateForeignScan(ForeignScanState *node)
                              festate->scan_data);
 
         /*
-         * grap the next work item
-         * note in case of parallel scan this isn't nessecarely the first one
+         * grab the next work item
+         * note in case of parallel scan this isn't necessarily the first one
          */
 
         festate->scan_data->cursor = next_work(festate->scan_data, scand);
@@ -1436,7 +1436,7 @@ retry:
                            RD_KAFKA_MSG_F_COPY,         // Make a copy of the payload.
                            festate->attribute_buf.data, // Message payload (value) and length
                            festate->attribute_buf.len,
-                           NULL, // Optional key and its length
+                           NULL, // Optional key
                            0,    // and its length
                            NULL  // Message opaque, provided in  delivery report callback as* msg_opaque.
     );
@@ -1618,7 +1618,7 @@ kafkaAcquireSampleRowsFunc(Relation   relation,
 
             /*
              * Ideally we need to peak individual messages from the partition evenly for
-             * statistics to be more accurate. Unfortunatelly it leads to a very slow
+             * statistics to be more accurate. Unfortunately it leads to a very slow
              * execution. As an alternative we read data with batches.
              *
              * Calculate how many batches should we read from this partition and how big
@@ -1689,7 +1689,7 @@ kafkaAcquireSampleRowsFunc(Relation   relation,
                         /*
                          * If any error occurs during parsing messages we should
                          * correctly release all kafka-related resources and
-                         * close connection because they are not maintaied by
+                         * close connection because they are not maintained by
                          * postgres' resource manager.
                          */
 
@@ -1703,7 +1703,7 @@ kafkaAcquireSampleRowsFunc(Relation   relation,
                 /* Error */
                 else if (rows_fetched < 0)
                 {
-                    elog(ERROR, "Failed to consuming a batch");
+                    elog(ERROR, "Failed to consume a batch");
                 }
                 /*
                  * And rows_fetched == 0 means that the request is timed out.

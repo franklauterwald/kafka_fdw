@@ -1,5 +1,5 @@
 /*
-TODO consider and simplyfy
+TODO consider and simplify
 SELECT * FROM kafka_test_part where (part between 1 and 2 and offs > 100) OR (part between 1 and 2 and offs > 200);
 SELECT * FROM kafka_test_part where (part between 3 and 2 and offs > 100) ;
 */
@@ -131,7 +131,7 @@ opername_to_op(const char *op)
 
     /*
         in a future release we might consider properly handling
-        of other operators as well for now we stop here
+        other operators as well for now we stop here
     */
     return OP_INVALID;
 
@@ -309,7 +309,7 @@ get_offset(List *           param_id_list,
 /*
  * get the high/low partition number for given parameters and operatoer
  *  param_id_list is an inter list of parameter ids (aka the column  number)
- * param_op_list is the to be applied operater (typically > < =)
+ * param_op_list is the to be applied operator (typically > < =)
  */
 static int32
 get_partition(List *           param_id_list,
@@ -372,7 +372,7 @@ get_partition(List *           param_id_list,
 
                 if (val >= INT32_MAX)
                     ereport(ERROR, (errcode(ERRCODE_FDW_ERROR), errmsg("partition number out of range")));
-                /* if we are looking for the low water mark we need max otherwisee min*/
+                /* if we are looking for the low water mark we need max otherwise min*/
                 if (low_high == LOW)
                     initial = max_int64(initial, val);
                 else
@@ -388,7 +388,7 @@ get_partition(List *           param_id_list,
     create a list of KafkaScanP as a to scan list for kafka
     scan_list is a List of List of Const Nodes created during planning
     we go through each element of that list and check if we need to expand
-    and existing item in the result list or append to it
+    an existing item in the result list or append to it
 */
 void
 KafkaFlattenScanlist(List *              scan_list,
@@ -620,7 +620,7 @@ dnfNorm(Expr *expr, int partition_attnum, int offset_attnum)
 }
 
 /*
-    parse operatore expressions to find relevant kafka scann infos
+    parse operator expressions to find relevant kafka scan infos
     and return a KafkaScanOp
     one side must be a kafka column (partition or offset)
     the other side a constant or parameter
@@ -723,8 +723,8 @@ applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum)
 
 /*
     create a KafkaScanOp for a given operator, kafkafield and value parameter
-    if the parameter is a constand we apply directly param nodes are added to
-    the relevant list for later porcesssing
+    if the parameter is a constant we apply directly param nodes are added to
+    the relevant list for later processsing
 */
 static KafkaScanOp *
 getKafkaScanOp(kafka_op op, scanfield field, Node *val_p)

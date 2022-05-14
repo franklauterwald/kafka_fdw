@@ -26,7 +26,7 @@ typedef enum /* type categories for datum_to_json */
 {
     JSONTYPE_NULL,    /* null, so we didn't bother to identify */
     JSONTYPE_BOOL,    /* boolean (built-in types only) */
-    JSONTYPE_NUMERIC, /* numeric (ditto) */
+    JSONTYPE_NUMERIC, /* numeric (dito) */
     JSONTYPE_DATE,    /* we use special formatting for datetimes */
     JSONTYPE_TIMESTAMP,
     JSONTYPE_TIMESTAMPTZ,
@@ -64,7 +64,7 @@ static void KafkaWriteAttributesCSV(KafkaFdwModifyState *festate, TupleTableSlot
 static void KafkaWriteAttributesJson(KafkaFdwModifyState *festate, TupleTableSlot *slot);
 
 /*
- * Parse the char into separate attributes (fields)
+ * Parse the message into separate attributes (fields)
  * Returns number of fields or -1 in case of unterminated quoted string
  */
 int
@@ -92,7 +92,7 @@ KafkaWriteAttributes(KafkaFdwModifyState *festate, TupleTableSlot *slot, enum ka
 }
 
 /*
- * Parse the char into separate attributes (fields)
+ * Parse the message into separate attributes (fields)
  * Returns number of fields or -1 in case of unterminated quoted string
  */
 static int
@@ -516,7 +516,7 @@ KafkaReadAttributesJson(char *msg, int msg_len, KafkaFdwExecutionState *festate,
     MemoryContext ccxt        = CurrentMemoryContext;
 
     *error = false;
-    /* much like populate_record_worker but with error cathing if needed */
+    /* much like populate_record_worker but with error catching if needed */
     if (ignore_junk)
     {
         PG_TRY();
@@ -1024,17 +1024,3 @@ KafkaWriteAttributesJson(KafkaFdwModifyState *festate, TupleTableSlot *slot)
 
     appendStringInfoCharMacro(result, '}');
 }
-/*
-
-
-
-
-
-
-
-
-
-
-
-
-*/

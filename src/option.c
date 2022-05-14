@@ -136,7 +136,7 @@ Datum kafka_fdw_validator(PG_FUNCTION_ARGS)
 /*
  * Fetch the options for a kafka_fdw foreign table.
  *
- * We have to separate separete Kafka Options from parsing options
+ * We have to separate Kafka Options from parsing options
  */
 void
 kafkaGetOptions(Oid foreigntableid, KafkaOptions *kafka_options, ParseOptions *parse_options)
@@ -147,7 +147,7 @@ kafkaGetOptions(Oid foreigntableid, KafkaOptions *kafka_options, ParseOptions *p
     List *              options;
 
     /*
-     * Extract options from FDW objects.  We ignore user mappings because
+     * Extract options from FDW objects. We ignore user mappings because
      * kafka_fdw doesn't have any options that can be specified there.
      */
 
@@ -165,7 +165,7 @@ kafkaGetOptions(Oid foreigntableid, KafkaOptions *kafka_options, ParseOptions *p
 }
 
 /*
- * Process the statement option list for Parsing.
+ * Process the statement option list for parsing.
  *
  * Scan the options list (a list of DefElem) and transpose the information
  * into parse_options, applying appropriate error checking.
@@ -318,7 +318,7 @@ KafkaProcessParseOptions(ParseOptions *parse_options, List *options)
 
 /*
  * Check if the provided option is one of the valid options.
- * context is the Oid of the catalog holding the object the option is for.
+ * context is the oid of the catalog holding the object the option is for.
  */
 static bool
 is_valid_option(const char *option, Oid context)
@@ -487,7 +487,7 @@ get_kafka_fdw_attribute_options(Oid relid, KafkaOptions *kafka_options)
         }
     }
 
-    /* calculate number of parsable columns */
+    /* calculate number of parseable columns */
 
     if (kafka_options->partition_attnum != -1)
         kafka_options->num_parse_col--;

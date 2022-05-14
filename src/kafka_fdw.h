@@ -179,7 +179,7 @@ typedef struct KafkaScanDataDesc
  */
 typedef struct KafkaFdwPlanState
 {
-    KafkaOptions kafka_options; /* kafka optopns */
+    KafkaOptions kafka_options; /* kafka optipns */
     ParseOptions parse_options; /* merged COPY options */
     double       nbatches;      /* estimate of number of batches needed */
     double       ntuples;       /* estimate of number of rows to scan */
@@ -200,7 +200,7 @@ typedef struct KafkaScanPData
  */
 typedef struct KafkaFdwExecutionState
 {
-    KafkaOptions         kafka_options;      /* kafka optopns */
+    KafkaOptions         kafka_options;      /* kafka optipns */
     ParseOptions         parse_options;      /* merged COPY options */
     rd_kafka_t *         kafka_handle;       /* connection to act on */
     rd_kafka_topic_t *   kafka_topic_handle; /* topic to act on */
