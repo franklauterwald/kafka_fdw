@@ -55,11 +55,13 @@
 #endif
 
 #define DEFAULT_KAFKA_OPTIONS                                                                                          \
-    .batch_size = 1000, .buffer_delay = 100, .offset_attnum = -1, .partition_attnum = -1, .junk_attnum = -1,           \
+    .batch_size = 1000, .buffer_delay = 100,                                                                           \
+	.offset_attnum = -1, .partition_attnum = -1, .timestamp_attnum  = -1, .raw_attnum = -1, .junk_attnum = -1,         \
     .junk_error_attnum = -1, .strict = false, .num_parse_col = 0, .ignore_junk = false, .num_partitions = 10
 
 #define parsable_attnum(_attn, _kop)                                                                                   \
     (_attn != _kop.junk_attnum && _attn != _kop.junk_error_attnum && _attn != _kop.partition_attnum &&                 \
+     _attn != _kop.timestamp_attnum && _attn != _kop.raw_attnum &&                                                     \
      _attn != _kop.offset_attnum)
 
 #define ScanopListGetPl(l) (DatumGetInt32(((Const *) list_nth(l, PartitionLow))->constvalue))
@@ -145,6 +147,8 @@ typedef struct KafkaOptions
     int   num_partitions;    /* number of partitions */
     int   offset_attnum;     /* attribute number for offset col */
     int   partition_attnum;  /* attribute number for partition col */
+    int   timestamp_attnum;  /* attribute number for timestamp col */
+    int   raw_attnum;        /* attribute number for raw col */
     int   junk_attnum;       /* attribute number for junk col */
     int   junk_error_attnum; /* attribute number for junk_error col */
     bool  strict;            /* force strict parsing */
@@ -269,7 +273,7 @@ void  KafkaFlattenScanlist(List *              scan_list,
                            KafkaScanPData *    scan_p);
 List *KafkaScanOpToList(KafkaScanOp *scan_op);
 bool  kafka_valid_scanop_list(List *scan_op_list);
-List *dnfNorm(Expr *expr, int partition_attnum, int offset_attnum);
+List *dnfNorm(Expr *expr, int partition_attnum, int offset_attnum, int timestamp_attnum, int raw_attnum);
 List *applyKafkaScanOpList(List *a, List *b);
 List *paramListToParamId(List *input);
 

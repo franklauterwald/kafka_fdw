@@ -48,6 +48,8 @@ static const struct KafkaFdwOption valid_options[] = {
     { "force_null", AttributeRelationId },
     { "offset", AttributeRelationId },
     { "partition", AttributeRelationId },
+	{ "raw", AttributeRelationId },
+	{ "timestamp", AttributeRelationId },
     { "junk", AttributeRelationId },
     { "junk_error", AttributeRelationId },
     { "json", AttributeRelationId },
@@ -343,6 +345,8 @@ KafkaProcessKafkaOptions(Oid relid, KafkaOptions *kafka_options, List *options)
     ListCell       *option;
     KafkaOptions    default_kafka_options = { .offset_attnum = -1,
                                               .partition_attnum = -1,
+											  .timestamp_attnum = -1,
+											  .raw_attnum = -1,
                                               .junk_attnum = -1 };
 
     /* Support external use for option sanity checking */
@@ -469,6 +473,20 @@ get_kafka_fdw_attribute_options(Oid relid, KafkaOptions *kafka_options)
                 if (defGetBoolean(def))
                     kafka_options->offset_attnum = attnum;
             }
+            else if (strcmp(def->defname, "timestamp") == 0)
+            {
+                if (kafka_options->timestamp_attnum != -1)
+                    ereport(ERROR, (errcode(ERRCODE_FDW_ERROR), errmsg("duplicate option timestamp")));
+                if (defGetBoolean(def))
+                    kafka_options->timestamp_attnum = attnum;
+            }
+            else if (strcmp(def->defname, "raw") == 0)
+            {
+                if (kafka_options->raw_attnum != -1)
+                    ereport(ERROR, (errcode(ERRCODE_FDW_ERROR), errmsg("duplicate option raw")));
+                if (defGetBoolean(def))
+                    kafka_options->raw_attnum = attnum;
+            }
             else if (strcmp(def->defname, "junk") == 0)
             {
                 if (kafka_options->junk_attnum != -1)
@@ -492,6 +510,10 @@ get_kafka_fdw_attribute_options(Oid relid, KafkaOptions *kafka_options)
     if (kafka_options->partition_attnum != -1)
         kafka_options->num_parse_col--;
     if (kafka_options->offset_attnum != -1)
+        kafka_options->num_parse_col--;
+    if (kafka_options->timestamp_attnum != -1)
+        kafka_options->num_parse_col--;
+    if (kafka_options->raw_attnum != -1)
         kafka_options->num_parse_col--;
     if (kafka_options->junk_attnum != -1)
         kafka_options->num_parse_col--;

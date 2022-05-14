@@ -34,7 +34,8 @@ KafkaEstimateSize(PlannerInfo *root, RelOptInfo *baserel, KafkaFdwPlanState *fdw
         RestrictInfo *rinfo = (RestrictInfo *) lfirst(lc);
 
         scan_list = applyKafkaScanOpList(
-          scan_list, dnfNorm(rinfo->clause, kafka_options->partition_attnum, kafka_options->offset_attnum));
+          scan_list, dnfNorm(rinfo->clause, kafka_options->partition_attnum, kafka_options->offset_attnum,
+        		  	  	  	  	  	  	    kafka_options->timestamp_attnum, kafka_options->raw_attnum));
     }
     /* an empty list evaluates to true (scan default all) */
     if (list_length(scan_list) == 0)

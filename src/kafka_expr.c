@@ -34,7 +34,9 @@ typedef enum scanfield
 {
     FIELD_INVALID = -1,
     FIELD_PARTITION,
-    FIELD_OFFSET
+    FIELD_OFFSET,
+	FIELD_TIMESTAMP,
+	FIELD_RAW
 } scanfield;
 
 enum low_high
@@ -45,7 +47,7 @@ enum low_high
 
 static void append_scan_p(KafkaScanPData *scand, KafkaScanP scan_p, int64 batch_size);
 
-static KafkaScanOp *applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum);
+static KafkaScanOp *applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum, int timestamp_attnum, int raw_attnum);
 static KafkaScanOp *getKafkaScanOp(kafka_op op, scanfield field, Node *val_p);
 static KafkaScanOp *intersectKafkaScanOp(KafkaScanOp *a, KafkaScanOp *b);
 
@@ -570,7 +572,7 @@ kafka_valid_scanop_list(List *scan_op_list)
     this basically builds an or_list
 */
 List *
-dnfNorm(Expr *expr, int partition_attnum, int offset_attnum)
+dnfNorm(Expr *expr, int partition_attnum, int offset_attnum, int timestamp_attnum, int raw_attnum)
 {
     List *result;
 
@@ -588,7 +590,7 @@ dnfNorm(Expr *expr, int partition_attnum, int offset_attnum)
             Expr *arg = (Expr *) lfirst(temp);
 
             // orlist=lappend(orlist, dnfNorm(arg,partition_attnum,offset_attnum));
-            orlist = list_concat(orlist, dnfNorm(arg, partition_attnum, offset_attnum));
+            orlist = list_concat(orlist, dnfNorm(arg, partition_attnum, offset_attnum, timestamp_attnum, raw_attnum));
         }
         return orlist;
     }
@@ -601,14 +603,14 @@ dnfNorm(Expr *expr, int partition_attnum, int offset_attnum)
         foreach (temp, ((BoolExpr *) expr)->args)
         {
             Expr *arg = (Expr *) lfirst(temp);
-            andlist   = applyKafkaScanOpList(andlist, dnfNorm(arg, partition_attnum, offset_attnum));
+            andlist   = applyKafkaScanOpList(andlist, dnfNorm(arg, partition_attnum, offset_attnum, timestamp_attnum, raw_attnum));
         }
         return andlist;
     }
 
     if (nodeTag(expr) == T_OpExpr)
     {
-        KafkaScanOp *scan_op = applyOperator((OpExpr *) expr, partition_attnum, offset_attnum);
+        KafkaScanOp *scan_op = applyOperator((OpExpr *) expr, partition_attnum, offset_attnum, timestamp_attnum, raw_attnum);
         if (scan_op != NULL)
         {
             result = list_make1(scan_op);
@@ -627,7 +629,7 @@ dnfNorm(Expr *expr, int partition_attnum, int offset_attnum)
 */
 
 static KafkaScanOp *
-applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum)
+applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum, int timestamp_attnum, int raw_attnum)
 {
     Node *           varatt, *valatt, *left, *right;
     bool             need_commute = false;
@@ -666,7 +668,8 @@ applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum)
 
     /* check that it's the right column */
     varattno = (int) ((Var *) varatt)->varattno;
-    if (varattno != partition_attnum && varattno != offset_attnum)
+    if (varattno != partition_attnum && varattno != offset_attnum &&
+  		varattno != timestamp_attnum && varattno != raw_attnum)
         return NULL;
 
     /*
@@ -716,6 +719,14 @@ applyOperator(OpExpr *oper, int partition_attnum, int offset_attnum)
     else if (varattno == offset_attnum)
     {
         return getKafkaScanOp(op, FIELD_OFFSET, valatt);
+    }
+    else if (varattno == timestamp_attnum)
+    {
+        return getKafkaScanOp(op, FIELD_TIMESTAMP, valatt);
+    }
+    else if (varattno == raw_attnum)
+    {
+        return getKafkaScanOp(op, FIELD_RAW, valatt);
     }
 
     return NULL;

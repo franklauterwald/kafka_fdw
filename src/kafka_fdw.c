@@ -290,7 +290,8 @@ kafkaGetForeignPlan(PlannerInfo *root,
     foreach (lc, scan_clauses)
     {
         scan_list = applyKafkaScanOpList(
-          scan_list, dnfNorm(lfirst(lc), kafka_options->partition_attnum, kafka_options->offset_attnum));
+          scan_list, dnfNorm(lfirst(lc), kafka_options->partition_attnum, kafka_options->offset_attnum,
+        		  	  	  	  	  	     kafka_options->timestamp_attnum, kafka_options->raw_attnum));
     }
     /* an empty list evaluates to true (scan default all) */
     if (list_length(scan_list) == 0)
