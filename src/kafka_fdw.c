@@ -936,6 +936,18 @@ ReadKafkaMessage(Relation                rel,
             nulls[m]  = false;
             continue;
         }
+        if (attnum == kafka_options->timestamp_attnum)
+        {
+            values[m] = Int64GetDatum(rd_kafka_message_timestamp(message, NULL));
+            nulls[m]  = false;
+            continue;
+        }
+        if (attnum == kafka_options->raw_attnum)
+        {
+            values[m] = values[m] = InputFunctionCall(&festate->in_functions[m], message->payload, festate->typioparams[m], attr->atttypmod);
+            nulls[m]  = false;
+            continue;
+        }
         if (fldnum >= fldct)
         {
             nulls[m] = true;
